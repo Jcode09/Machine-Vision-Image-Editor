@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Histogram</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('https://seanmurphy.dev/photojs/assets/images/bg.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        #histogramCanvas {
+            width: 600px; /* Adjust this as needed for better viewing */
+            height: 300px; /* Adjust this as needed for better viewing */
+            border: 2px solid #000; /* Optional border for visibility */
+        }
+
+        #valueCanvas {
+            position: absolute;
+            top: 10px;
+            left: 620px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <input type="file" id="fileInput" accept="image/*">
+    <canvas id="histogramCanvas"></canvas>
+    <canvas id="valueCanvas" width="200" height="300"></canvas>
+
+    <script>
+        // Paste your JavaScript code here
+
+        /** 
+        @module histogram
+        */
+        "use strict";
+        function Histogram(conf){
+            if (!(this instanceof Histogram)) return new Histogram(conf);
+
+            this.histogram = [];
+            this.conf = {
+                width: 255,
+                height: 128,
+                red: "#d55",
+                green: "#5d5",
+                blue: "#55d",
+                black: "#555"
+            };
+            this.setConf(conf);
+            this.canvas = document.getElementById('histogramCanvas');
+            this.context = this.canvas.getContext('2d');
+            this.valueCanvas = document.getElementById('valueCanvas');
+            this.valueContext = this.valueCanvas.getContext('2d');
+            this.clearRGB();
+        }
+
+        Histogram.prototype.setConf = function(conf){
+            var name = "";
+            for (name in conf){
+                this.conf[name] = conf[name];
+            }
+            return this;
+        };
+
+        Histogram.prototype.forImg = function(source){
+            var srcCanvas = document.createElement("canvas");
+            var ctx = srcCanvas.getContext('2d');
+            ctx.canvas.width = source.width;
+            ctx.canvas.height = source.height;
+            ctx.drawImage(source, 0, 0);
+            return this.forCanvas(srcCanvas);
+        };
+
+        Histogram.prototype.forCanvas = function(source){
+            var ctx = source.getContext('2d');
+            var img = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+            
+            for (var i=0; i<img.data.length; i=i+4){
+                this.setRGB({
+                    r: img.data[i],
+                    g: img.data[i+1],
+                    b: img.data[i+2]
+                });
+            }
+
+            return this.draw();
+        };
+
+        Histogram.prototype.clearRGB = function(){
+            for (var i=0; i<=255; i++){
+                this.histogram[i] = {
+                    r: 0,
+                    g: 0,
+                    b: 0
+                };
+            }
+        };
+
+        Histogram.prototype.setRGB = function(val){
+            this.histogram[Math.min(255, Math.max(0, val.r))].r++;
+            this.histogram[Math.min(255, Math.max(0, val.g))].g++;
+            this.histogram[Math.min(255, Math.max(0, val.b))].b++;
+        };
+
+        Histogram.prototype.draw = function(){
+            this.context.canvas.width = this.conf.width;
+            this.context.canvas.height = this.conf.height;	
+            
+            var m=0;
+            for (var i = 1; i < 255; i++){
+                m = Math.max(m, this.histogram[i].r, this.histogram[i].g, this.histogram[i].b);
+            }
+            
+            this.context.globalCompositeOperation="lighter";
+
+            this.drawPoly(this.conf.red, function(val){
+                return val.r / m;
+            });
+
+            this.drawPoly(this.conf.green, function(val){
+                return val.g / m;
+            });
+
+            this.drawPoly(this.conf.blue, function(val){
+                return val.b / m;
+            });
+
+            this.context.globalCompositeOperation="source-over";	
+
+            this.drawPoly(this.conf.black, function(val){
+                var r = val.r / m;
+                var g = val.g / m;
+                var b = val.b / m;
+                return Math.min(r,g,b);					
+            });
+
+            // Clear the value canvas
+            this.valueContext.clearRect(0, 0, this.valueCanvas.width, this.valueCanvas.height);
+            
+            // Draw values
+            this.valueContext.font = "14px Arial, sans-serif";
+            this.valueContext.fillStyle = '#000';
+            this.valueContext.fillText("Red: " + Math.round(this.histogram[255].r * 100 / m) / 100, 10, 20);
+            this.valueContext.fillText("Green: " + Math.round(this.histogram[255].g * 100 / m) / 100, 10, 40);
+            this.valueContext.fillText("Blue: " + Math.round(this.histogram[255].b * 100 / m) / 100, 10, 60);
+            this.valueContext.fillText("Black: " + Math.round(Math.min(this.histogram[255].r, this.histogram[255].g, this.histogram[255].b) * 100 / m) / 100, 10, 80);
+
+            return this.canvas.toDataURL();
+        };
+
+        Histogram.prototype.drawPoly = function(colour, val){
+            var w = this.context.canvas.width;
+            var h = this.context.canvas.height;
+            this.context.beginPath();		
+            this.context.moveTo(0, h);		
+            this.context.fillStyle = colour;
+            for (var x = 0; x<=255; x++){
+                this.context.lineTo((w/255)*x,(h-(val(this.histogram[x])*h)));						
+            }			
+            this.context.lineTo(w, h);
+            this.context.closePath();
+            this.context.fill();
+        };
+
+
+        // Handling file input change event
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            var file = event.target.files[0];
+            var img = new Image();
+            img.onload = function() {
+                var histogram = new Histogram();
+                var dataURL = histogram.forImg(this);
+                var resultCanvas = document.getElementById('histogramCanvas');
+                var ctx = resultCanvas.getContext('2d');
+                var resultImage = new Image();
+                resultImage.onload = function() {
+                    ctx.drawImage(this, 0, 0);
+                };
+                resultImage.src = dataURL;
+            };
+            img.src = URL.createObjectURL(file);
+        });
+    </script>
+</body>
+</html>

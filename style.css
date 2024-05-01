@@ -1,0 +1,284 @@
+
+/* Add your custom styles here */
+
+/* Online CSS Import */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* Custom Styles */
+
+body {
+  text-align: center;
+  margin: auto;
+  background: url('https://seanmurphy.dev/photojs/assets/images/bg.png');
+  background-repeat: repeat;
+  color: white;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 12px;
+}
+
+.title {
+  background: var(--title-background-color);
+  padding: 20px;
+  text-align: center;
+  font-family: 'Public Pixel', sans-serif;
+  margin-bottom: 20px;
+  font-size: 30px;
+  font-style: italic;
+  background: linear-gradient(to right, #0ab7fc, #ff006a); /* Gradient background from left to right */
+  -webkit-background-clip: text; /* Clip the background to the text */
+  -webkit-text-fill-color: transparent; /* Set text fill color to transparent */
+}
+
+
+.line-text {
+  position: absolute;
+  z-index: 9999; /* Ensure it's on top of other elements */
+  top: 25%;
+  left: 50%;
+  font-size: 15px;
+  font-family: 'MD Dasher', sans-serif;
+  transform: translate(-50%, -50%);
+  padding: 0 10px; /* Adjust padding as needed */
+}
+
+.line-text a {
+  transition: font-size 0.3s; /* Smooth transition for the font size */
+}
+
+.line-text a:hover {
+  color: #f1f1f1; /* Change color on hover */
+  font-size: 1.1em; /* Zoom effect on hover */
+}
+
+#options-container {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #fff; /* White background */
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    text-align: center; /* Center the content */
+    display: flex; /* Make options horizontal */
+    flex-wrap: wrap; /* Allow wrapping */
+    justify-content: center; /* Center the options horizontally */
+    max-width: 800px; /* Set maximum width */
+    margin: 0 auto; /* Center the container horizontally */
+  }
+
+#options-container label {
+    display: inline-block;
+    margin-right: 20px; /* Add space between options */
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-family: 'Lucida Handwriting Std', sans-serif;
+    color: #444; /* Dark gray text color */
+}
+
+#options-container input[type="checkbox"],
+#options-container input[type="file"],
+#options-container button {
+    background-color: #4CAF50; /* Green background color */
+    color: #fff; /* White text color */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+#options-container input[type="checkbox"]:hover,
+#options-container input[type="file"]:hover,
+#options-container button:hover {
+    background-color: #45a049; /* Darker green on hover */
+    transform: scale(1.05); /* Increase size on hover */
+}
+
+#options-container input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+#adjustmentsContainer,
+#colorHueOptions {
+    background-color: #130241; /* White background */
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    font-family: 'Lucida Handwriting Std', sans-serif;
+    margin-top: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* CSS */
+.color-hue-options,
+.adjustments-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.option-container {
+    margin-top: 20px;
+}
+
+#filterSelect {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: 'Lucida Handwriting Std', sans-serif;
+    font-size: 14px;
+    color: #130241; /* Dark gray text color */
+    transition: border-color 0.3s ease; /* Add transition effect for border color */
+    justify-content: center; /* Center the options horizontally */
+    max-width: 1000px; /* Set maximum width */
+    margin: 0 auto; /* Center the container horizontally */
+}
+
+#filterSelect:hover {
+    border-color: #130241; /* Darken border color on hover */
+}
+
+#filterSelect option {
+    transition: transform 0.3s ease; /* Add transition effect for zoom */
+}
+
+#filterSelect option:hover {
+    transform: scale(1.05); /* Zoom in on hover */
+}
+
+#editor-container {
+    margin-top: 30px;
+}
+
+#images-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#original-container,
+#processed-container {
+  display: flex;
+  flex-direction: column;
+  font-family: Papyrus, fantasy;
+  align-items: center;
+  border: 1px solid white; 
+  color: white;
+  border-radius: 5px; 
+  padding: 20px; 
+  margin-top: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+#original-img,
+#processed-img {
+  max-width: 100%;
+  font-family: Papyrus, fantasy;
+  max-height: 300px; 
+  border: 1px solid white; 
+  color: white;
+  border-radius: 5px; 
+  padding: 20px; 
+  margin-top: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+/* Improved button styling */
+
+#fileInput,
+#convertBtn {
+    background-color: #130241; /* Blue background color */
+    color: #fff; /* White text color */
+    border: none;
+    font-family: 'Lucida Handwriting Std', sans-serif;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: 16px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+#fileInput:hover,
+#convertBtn:hover {
+    background-color: #02577e; /* Darker blue on hover */
+    transform: scale(1.05); /* Increase size on hover */
+}
+
+/* CSS */
+.color-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border: 1px solid #000;
+  }
+  
+  #redSliderLabel {
+    color: red;
+  }
+  
+  #greenSliderLabel {
+    color: green;
+  }
+  
+  #blueSliderLabel {
+    color: blue;
+  }
+
+ /* CSS for adjustmentsContainer */
+#adjustmentsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* CSS for image icons */
+  #adjustmentsContainer img {
+    width: 15px; /* Adjust size as needed */
+    height: auto;
+  }
+  
+  /* CSS for slider inputs */
+  #adjustmentsContainer input[type="range"] {
+    width: 100px; /* Adjust size as needed */
+    margin-top: 5px; /* Adjust spacing */
+  }
+  
+  #options-container img {
+    width: 20px; /* Adjust the width as needed */
+    height: auto;
+    margin-right: 10px;
+  }
+  
+  label {
+    font-family: 'Lucida Handwriting Std', sans-serif;
+    color: rgb(224, 210, 210);
+    font-size: 18px; /* Adjust the font size */
+    font-weight: bold; /* Add bold font weight */
+}
+
+#options-container button#shapesColorDetectionBtn {
+  background-color: #130241; /* Blue background color */
+  color: #fff; /* White text color */
+  border: none;
+  font-family: 'Lucida Handwriting Std', sans-serif;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-size: 16px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+#options-container button#shapesColorDetectionBtn:hover {
+  background-color: #02577e; /* Darker blue on hover */
+  transform: scale(1.05); /* Increase size on hover */
+}
+

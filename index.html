@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JeBeL Image Editor</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+<link href="https://fonts.cdnfonts.com/css/lucida-handwriting-std" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/md-dasher" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/public-pixel" rel="stylesheet">
+<style>
+  @import url('https://fonts.cdnfonts.com/css/lucida-handwriting-std');
+</style>
+<style>
+  @import url('https://fonts.cdnfonts.com/css/md-dasher'); 
+</style>
+<style>
+  @import url('https://fonts.cdnfonts.com/css/public-pixel');
+</style>
+
+<style>
+  /* Add border style for iframe container */
+  #iframe-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 20px;
+    padding: 10px;
+  }
+
+  /* Style for iframe */
+  #content-iframe {
+    width: 100%;
+    height: 1000px;
+  }
+</style>
+
+</head>
+<body>
+<div class="title">
+  <h1>Photo<span class="highlight">BeL</span></h1>
+    <img src="logo1.png" alt="Image" style="width: 100px; height: auto;">
+</div>
+<div class="title-line">
+  <span class="line-text">
+    <a href="https://github.com/Jcode09/2A-RGB-CALUNSAG.git">Created by Jeriebel B. Calunsag CPE 3</a>
+  </span>
+</div>
+
+<div id="options-container">
+  <label for="grayscaleCheckbox">
+    <img src="grayscale.png" alt="Grayscale Icon">
+    Grayscale
+  </label>
+  <input type="checkbox" id="grayscaleCheckbox">
+  
+  <label for="binaryCheckbox">
+    <img src="binary.png" alt="Binary Icon">
+    Binary
+  </label>
+  <input type="checkbox" id="binaryCheckbox"> 
+  
+  <label for="colorHueCheckbox">
+    <img src="color.png" alt="Color Hue Icon">
+    Color Hue
+  </label>
+  <input type="checkbox" id="colorHueCheckbox">
+  
+  <label for="adjustmentsOptions">
+    <img src="adjustment.png" alt="Adjustments Icon">
+    Adjustments
+  </label>
+  <input type="checkbox" id="adjustmentsOptions">
+  
+  <label for="backgroundRemovalCheckbox">
+    <img src="segmentation.png" alt="Background Removal Icon">
+    Segmentation
+  </label>
+  <input type="checkbox" id="backgroundRemovalCheckbox">
+  
+  <label>
+    <button id="shapesColorDetectionBtn">Shapes and Colors Detection</button>
+  </label>
+</div>
+
+<label for="fileInput">Choose an image</label>
+<input type="file" id="fileInput">    
+<button id="convertBtn">Convert</button>
+
+<div id="grayscaleThresholdContainer" class="option-container" style="display:none">
+  <label for="grayscaleThresholdSlider">Grayscale Threshold: <span id="grayscaleThresholdValue">255</span></label>
+  <input type="range" id="grayscaleThresholdSlider" min="0" max="255" value="255">
+</div>
+
+<div id="binaryThresholdContainer" class="option-container" style="display:none">
+  <label for="binaryThresholdSlider">Binary Threshold: <span id="binaryThresholdValue">128</span></label>
+  <input type="range" id="binaryThresholdSlider" min="0" max="255" value="128">
+</div>
+
+<div id="colorHueOptions" class="option-container" style="display:none">
+  <label id="redSliderLabel" for="redSlider">
+    <span class="color-box" style="background-color: red;"></span>Red: <span id="redValue">0</span>
+  </label>
+  <input type="range" id="redSlider" min="0" max="255" value="0" class="slider">
+  
+  <label id="greenSliderLabel" for="greenSlider">
+    <span class="color-box" style="background-color: green;"></span>Green: <span id="greenValue">0</span>
+  </label>
+  <input type="range" id="greenSlider" min="0" max="255" value="0" class="slider">
+  
+  <label id="blueSliderLabel" for="blueSlider">
+    <span class="color-box" style="background-color: blue;"></span>Blue: <span id="blueValue">0</span>
+  </label>
+  <input type="range" id="blueSlider" min="0" max="255" value="0" class="slider">
+</div>
+
+<div id="adjustmentsContainer" class="option-container" style="display:none">
+  <label for="brightnessSlider"><img src="brightness.png" alt="Brightness Icon"></label>
+  <input type="range" id="brightnessSlider" min="0" max="100" value="0">
+  <span id="brightnessValue">0</span>
+  
+  <label for="contrastSlider"><img src="contrast.png" alt="Contrast Icon"></label>
+  <input type="range" id="contrastSlider" min="1" max="2" step="0.1" value="1">
+  <span id="contrastValue">1</span>
+  
+  <label for="opacitySlider"><img src="opacity.png" alt="Opacity Icon"></label>
+  <input type="range" id="opacitySlider" min="0" max="1" step="0.01" value="1">
+  <span id="opacityValue">1</span>
+  
+  <label for="saturationSlider"><img src="saturation.png" alt="Saturation Icon"></label>
+  <input type="range" id="saturationSlider" min="0" max="2" step="0.01" value="1">
+  <span id="saturationValue">1</span>
+  
+  <label for="sharpnessSlider"><img src="sharpness.png" alt="Sharpness Icon"></label>
+  <input type="range" id="sharpnessSlider" min="0" max="2" value="0">
+  <span id="sharpnessValue">0</span>
+  
+  <label for="blurSlider"><img src="blur.png" alt="Blur Icon"></label>
+  <input type="range" id="blurSlider" min="0" max="2" value="0">
+  <span id="blurValue">0</span>
+</div>
+
+
+<div class="option-container">
+  <label for="filterSelect">Filter</label>
+  <select id="filterSelect">
+    <option value="none">None</option>
+    <option value="sepia">Sepia</option>
+    <option value="vivid">Vivid</option>
+    <option value="mono">Monochrome</option>
+    <option value="noir">Noir</option>
+    <option value="lark">Lark</option>
+    <option value="amaro">Amaro</option>
+    <option value="blackandwhite">Black and White</option>
+    <option value="santorini">Santorini</option>
+    <option value="tranquil">Tranquil</option>
+    <option value="gradient">Gradient</option>
+    <option value="sunglow">Sunglow</option>
+    <option value="invert">Invert</option>
+  </select>
+</div>
+
+<div id="editor-container">
+  <div id="images-container">
+    <div id="original-container">
+      <h2>Original Image</h2>
+      <img id="original-img" src="#" alt="Original Image">
+    </div>
+    <div id="processed-container">
+      <h2>Edited Image</h2>
+      <img id="processed-img" src="#" alt="Edited Image">
+    </div>
+  </div>
+</div>
+
+<!-- Container for the iframe with border -->
+<div id="iframe-container">
+  <iframe id="content-iframe" src="ShapesnColors/shapesncolor.html"></iframe>
+</div>
+
+<script src="script.js"></script>
+<script async src="opencv.js" onload="initializeOpenCV();" type="text/javascript"></script>
+<script>
+  document.getElementById('shapesColorDetectionBtn').addEventListener('click', function() {
+    window.location.href = 'ShapesnColors/color.html'; // Redirect to the other HTML file
+  });
+</script>
+<script>
+  // Function to handle file selection
+  document.getElementById('fileInput').addEventListener('change', function(event) {
+    var file = event.target.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var imageData = e.target.result;
+      // Pass image data to the external HTML page
+      document.getElementById('content-iframe').contentWindow.postMessage(imageData, '*');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  <!-- Inside script tag -->
+// Function to retrieve the processed image source from localStorage and update the image element
+function updateProcessedImage() {
+    let processedImageSrc = localStorage.getItem('processedImageSrc');
+    if (processedImageSrc) {
+        let processedImg = document.getElementById('imageOriginal');
+        processedImg.src = processedImageSrc;
+    }
+}
+
+
+// Call the function when the external HTML loads
+window.onload = function() {
+    updateProcessedImage();
+};
+
+</script>
+</body>
+</html>
