@@ -5,25 +5,20 @@
 <title>Advanced Image Editor</title>
 <style>
   @import url('https://fonts.cdnfonts.com/css/lucida-handwriting-std');
-</style>
-<style>
   @import url('https://fonts.cdnfonts.com/css/md-dasher');
-</style>
-<style>
   @import url('https://fonts.cdnfonts.com/css/public-pixel');
 </style>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 <style type="text/css">
-
 .modal {
-    display:    none;
-    position:   fixed;
-    z-index:    1000;
-    top:        0;
-    left:       0;
-    height:     100%;
-    width:      100%;
-    background: rgba( 255, 255, 255, .8 ) 
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, .8) 
                 url('http://i.stack.imgur.com/FhHRx.gif') 
                 50% 50% 
                 no-repeat;
@@ -31,7 +26,6 @@
 body.loading {
     overflow: hidden;   
 }
-
 body.loading .modal {
     display: block;
 }
@@ -39,403 +33,483 @@ body {
     background-image: url('https://seanmurphy.dev/photojs/assets/images/bg.png');
     background-size: cover;
     background-repeat: no-repeat;
+    background-attachment: fixed; /* Ensure background remains fixed */
     font-family: 'Lucida Handwriting Std', 'MD Dasher', sans-serif;
+}
+
+#imageOriginal {
+    display: none;
+}
+
+#imageCanvas {
+    border: 1px solid #ddd; /* Optional: Add a border for better visibility */
 }
 
 .container {
     background-color: rgba(255, 255, 255, 0.8); 
     padding: 20px;
 }
-
 .card {
     background-color: rgba(255, 255, 255, 0.9); 
     margin-bottom: 20px;
 }
-
 .jumbotron h1 {
     font-family: 'Public Pixel', sans-serif;
 }
 
-#histogramCanvas {
-        display: block;
-        margin: 0 auto; /* Center the histogram */
-        width: 600px; /* Adjust width as needed */
-        height: 400px; /* Adjust height as needed */
+.loading {
+    display: none;
+}
+
+.histogram-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.histogram {
+    border: 1px solid #000;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.histogram-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.histogram-value {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Style for the custom file input button */
+.custom-file-input {
+    display: none;
+}
+.custom-file-label {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.custom-file-label:hover {
+    background-color: #0056b3;
+}
+
+    #applyTranslationButton {
+        display: none;
     }
 
-    #valueCanvas {
-        display: block;
-        margin: justify; /* Add margin for spacing */
-        width: 400px; /* Adjust width as needed */
-        height: auto; /* Make it responsive */
-    }
 
-    #valueCanvas {
-        font-size: 18px; /* Increase font size */
-        font-weight: bold; /* Make the font bold */
-    }
 </style>
 </head>
 <body>
 <div class="container">
-    <div class="jumbotron">
+    <div class="jumbotron text-center">
         <h1>Photobel - Advanced Image Editor</h1> 
-        <p>Advanced Image Editor Programming 5 -13  - Jeriebel B. Calunsag</p> 
+        <p>Advanced Image Editor Programming 5 - 13  - Jeriebel B. Calunsag</p> 
     </div>
     <div class="row">
-        <div class="col-sm">
+        <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
-                Original Image
+                <div class="card-header text-center">
+                    Image
                 </div>
-                <div class="card-block text-center">
+                <div class="card-body text-center">
+                    <canvas id="imageCanvas"></canvas>
                     <img id="imageOriginal" alt="Upload" class="card-img-top"/>
-                </div>
-                <div class="card-footer text-muted">
-                    <input type="file" id="imageInput" name="file" />
+                    <div class="card-footer text-center">
+                        <!-- Custom file input button -->
+                        <label for="imageInput" class="custom-file-label">Choose File</label>
+                        <input type="file" id="imageInput" name="file" class="custom-file-input"/>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-sm">
+        </div>        
+    </div>
+    <div class="row">
+        <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
-                Result
+                <div class="card-header text-center">
+                    PhotoBel Buttons
                 </div>
-                <div class="card-block">
-                    <canvas id="imageCanvas"></canvas>
+                <div class="card-body text-center">
+                    <div id="centroidDisplay" class="mt-3"></div> <!-- Added this line -->
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <button type="button" id="detectShapesButton" class="btn btn-primary">Detect Shapes</button>
-                    </li>
-                    <li class="list-group-item">
-                        <button type="button" id="detectObjectButton" class="btn btn-success">Detect Object</button>
-                        <button type="button" id="removeBackgroundButton" class="btn btn-danger">Remove Background</button>
-                        <!-- Modify the "Show RGB Histogram" button -->
-                        <button type="button" id="showRGBHistogramButton" class="btn btn-primary" onclick="showRGBHistogram()">Show RGB Histogram</button>
-                         <!-- Add the reset button -->
-                        <button type="button" id="resetButton" class="btn btn-secondary">Reset</button>
-                    </li>
-                </ul>
-                <div class="row">
-                    <div class="col-sm">
-                        <label for="thresholdSlider">Background Removal Threshold:</label>
-                        <input type="range" id="thresholdSlider" name="thresholdSlider" min="0" max="255" value="100">
-                        <span id="thresholdValue">100</span>
-                    </div>
-                <div class="card-footer">
+                <div class="card-footer text-center">
+                    <button type="button" id="detectShapesButton" class="btn btn-primary mb-2">Detect Shapes</button>
+                    <button type="button" id="detectObjectButton" class="btn btn-success mb-2">Detect Object</button>
+                    <button type="button" id="markCentroidButton" class="btn btn-success mb-2">Mark Centroid</button>
+                    <button type="button" id="removeBackgroundButton" class="btn btn-danger mb-2">Remove Background</button>
+                    <button type="button" id="histogramButton" class="btn btn-info mb-2">Show Histogram</button>
+                    <button type="button" id="binaryProjectionButton" class="btn btn-info mb-2">Show Binary Projection</button>
+                    <label for="projectionSelect">Projection Type:</label>
+                    <select id="projectionSelect">
+                    <option value="horizontal">Horizontal</option>
+                    <option value="vertical">Vertical</option>
+                    </select>
+                    <button type="button" id="resetButton" class="btn btn-secondary mb-2">Reset</button>
+                </div>
+            </div>
+            <div class="card mt-3">
+                <div class="card-body text-center">
+                    <label for="thresholdSlider">Background Removal Threshold:</label>
+                    <input type="range" id="thresholdSlider" name="thresholdSlider" min="0" max="255" value="100">
+                    <span id="thresholdValue">100</span>
+                </div>
+                <div class="card-footer text-center">
                     <a href="#" id="downloadButton" class="card-link">Download Image</a>
                 </div>
             </div>
         </div>
+        
     </div>
 
-
-    <div class="row">
-        <div class="col-sm">
+    <div class="row mt-3">
+        <div class="col-md-4">
             <label for="rotateInput">Rotate Image (degrees): </label>
             <input type="range" id="rotateInput" name="rotateInput" min="0" max="360" value="0">
             <span id="rotationValue">0</span>
         </div>
-        <div class="col-sm">
+        <div class="col-md-4">
             <label for="mirrorSelect">Mirror Image: </label>
-            <select id="mirrorSelect" name="mirrorSelect">
+            <select id="mirrorSelect" name="mirrorSelect" class="form-control">
                 <option value="0">No mirror</option>
                 <option value="1">Horizontal</option>
                 <option value="2">Vertical</option>
             </select>
         </div>
+        <div class="col-md-4 text-center">
+             <button type="button" id="applyTranslationButton" class="btn btn-primary mt-4">Apply Translation</button> 
+        </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label for="translateXInput">Translate X:</label>
+                <input type="range" id="translateXInput" name="translateXInput" value="0" min="-100" max="100" class="form-range">
+                <span id="translateXValue">0</span>
+            </div>
+            <div class="col-md-4">
+                <label for="translateYInput">Translate Y:</label>
+                <input type="range" id="translateYInput" name="translateYInput" value="0" min="-100" max="100" class="form-range">
+                <span id="translateYValue">0</span>
+            </div>
+        <div class="col-md-4">
+            <label for="filterSelect">Filter: </label>
+            <select id="filterSelect" class="form-control">
+                <option value="smoothing">Smoothing</option>
+                <option value="gaussian">Gaussian</option>
+                <option value="sharpening">Sharpening</option>
+                <option value="meanRemoval">Mean Removal</option>
+                <option value="emboss">Emboss</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
     </div>
 
-    <!-- HTML code -->
-<div class="row">
-    <div class="col-sm">
-        <label for="translateXInput">Translate X:</label>
-        <input type="number" id="translateXInput" name="translateXInput" value="0">
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <label>Custom Kernel Values:</label>
+            <div id="customKernelValues" class="form-group">
+                <div class="form-row">
+                    <div class="col">
+                        <input type="text" id="kernelValue0" value="0" class="form-control">
+                    </div>
+                    <div class="col">
+                        <input type="text" id="kernelValue1" value="-1" class="form-control">
+                    </div>
+                    <div class="col">
+                        <input type="text" id="kernelValue2" value="0" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row mt-2">
+                    <div class="col">
+                        <input type="text" id="kernelValue3" value="-1" class="form-control">
+                    </div>
+                    <div class="col">
+                        <input type="text" id="kernelValue4" value="5" class="form-control">
+                    </div>
+                    <div class="col">
+                        <input type="text" id="kernelValue5" value="-1" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row mt-2">
+                    <div class="col">
+                        <input type="text" id="kernelValue6" value="0" class="form-control">
+                    </div>
+                    <div class="col">
+                        <input type="text" id="kernelValue7" value="-1" class="form-control">
+                    </div>
+                    <div class="col">
+                        <input type="text" id="kernelValue8" value="0" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <button id="applyFilterButton" class="btn btn-primary mt-2">Apply Filter</button>
+        </div>
     </div>
-    <div class="col-sm">
-        <label for="translateYInput">Translate Y:</label>
-        <input type="number" id="translateYInput" name="translateYInput" value="0">
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm">
-        <button type="button" id="applyTranslationButton" class="btn btn-primary">Apply Translation</button>
-    </div>
-</div>
 
-    <div class="row">
-        <div class="col-sm">
+    <div class="row mt-3">
+        <div class="col-md-6">
             <div id="shapeCount"></div>
         </div>
-        <div class="col-sm">
+        <div class="col-md-6">
             <div id="colorCount"></div>
         </div>
     </div>
-
-    <!-- <h2>Centroid Display: </h2> -->    
-
-    <div class="row">
-        <div class="col-sm">
-            <div id="centroidDisplay">
-                <!-- Centroid information will be displayed here -->      
-                <h2>Centroid Display: </h2>
-                <p id="imageCentroid"></p>
-                <p id="objectCentroid"></p>
-            </div>
+    
+    
+    <div class="histogram-container">
+        <h2 class="histogram-title">RGB Histogram</h2>
+        <div class="histogram" id="histRed">
+            <h3>Red Histogram</h3>
+            <div class="histogram-bars"></div>
+            <!-- <div class="histogram-value" id="redValueLabel">Red Value: </div> -->
+        </div>
+        <div class="histogram" id="histGreen">
+            <h3>Green Histogram</h3>
+            <div class="histogram-bars"></div>
+           <!-- <div class="histogram-value" id="greenValueLabel">Green Value: </div> -->
+        </div>
+        <div class="histogram" id="histBlue">
+            <h3>Blue Histogram</h3>
+            <div class="histogram-bars"></div>
+           <!-- <div class="histogram-value" id="blueValueLabel">Blue Value: </div> -->
         </div>
     </div>
-</div>
-
-  <!-- HTML code <div id="iframe-container"></div> -->
-  
-  <div class="container">
-    <h2 id="histogramTitle">RGB HISTOGRAM</h2>
-    <!-- Existing HTML content -->
-  <!-- Canvas for displaying the histogram -->
-  <canvas id="histogramCanvas"></canvas>
-  <!-- Canvas for displaying histogram values -->
-  <canvas id="valueCanvas" width="200" height="80"></canvas>
-</div>
-
 
 <div class="modal"></div>
 <script type="text/javascript">
     document.body.classList.add("loading");
-
     
     // Function to receive edited image data and display in the result canvas
-    window.addEventListener('message', function(event) {
-        var imageData = event.data;
-        var canvas = document.getElementById('imageCanvas');
-        var ctx = canvas.getContext('2d');
-        var img = new Image();
-        img.onload = function() {
-            canvas.width = img.width;
+    window.addEventListener('message', function(event) {   
+        var imageData = event.data;   
+        var canvas = document.getElementById('imageCanvas');   
+        var ctx = canvas.getContext('2d');     
+        var img = new Image(); 
+        img.onload = function() {  
+            canvas.width = img.width;    
             canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
+            ctx.drawImage(img, 0, 0);   
         };
-        img.src = imageData;
+        img.src = imageData;   
     });
 
+    //TO LOAD IMAGES
 
     let imgElement = document.getElementById('imageOriginal');
     let inputElement = document.getElementById('imageInput');
     inputElement.addEventListener('change', (e) => {
-        // Clear display labels
-        document.getElementById('imageCentroid').innerText = "";
-        document.getElementById('objectCentroid').innerText = "";
-        document.getElementById('shapeCount').innerHTML = "";
+        //document.getElementById('imageCentroid').innerText = "";
+       //document.getElementById('objectCentroid').innerText = "";
+        document.getElementById('shapeCount').innerHTML = ""; 
         document.getElementById('colorCount').innerHTML = "";
-        imgElement.src = URL.createObjectURL(e.target.files[0]);
+        imgElement.src = URL.createObjectURL(e.target.files[0]);  
     }, false);
-    let mat;
+    let mat; 
     
     imgElement.onload = function() {
-      mat = cv.imread(imgElement);
-      cv.imshow('imageCanvas', mat);
-    };
-    
+    mat = cv.imread(imgElement);   
+    cv.imshow('imageCanvas', mat);  
+};
     let shapeCount;
     let colorCounts;
     
-    window.addEventListener('message', function(event) {
-        var imageData = event.data;
-        var imgElement = document.getElementById('imageOriginal');
-        imgElement.src = imageData;
+    window.addEventListener('message', function(event) { 
+        var imageData = event.data;  
+        var imgElement = document.getElementById('imageOriginal'); 
+        imgElement.src = imageData;  
     });
 
-    document.getElementById('detectShapesButton').onclick = async function() {
-        this.disabled = true;
+    document.getElementById('imageInput').addEventListener('change', handleImageUpload);
 
-        shapeCount = {
-            "Circle": 0,
-            "Triangle": 0,
-            "Square": 0,
-            "Rectangle": 0,
-            "Quadrilateral": 0,
-            "Pentagon": 0
-        };
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
 
-        colorCounts = {
-            'yellow': 0,
-            'red': 0,
-            'blue': 0,
-            'green': 0
-        };
+    reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.getElementById('imageCanvas');
+            const ctx = canvas.getContext('2d');
 
-        let src = cv.imread('imageCanvas');
-        let gray = new cv.Mat();
-        cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+            // Set canvas dimensions to match image
+            canvas.width = img.width;
+            canvas.height = img.height;
 
-        cv.adaptiveThreshold(gray, gray, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2);
-
-        let kernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3));
-        cv.dilate(gray, gray, kernel);
-        cv.erode(gray, gray, kernel);
-
-        let contours = new cv.MatVector();
-        let hierarchy = new cv.Mat();
-        cv.findContours(gray, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-
-        let dst = src.clone();
-        let colors = [new cv.Scalar(57, 255, 20, 255)];
-
-        let imageCentroid = { x: 0, y: 0 };
-        let objectCentroid = { x: 0, y: 0 };
-
-        for (let i = 0; i < contours.size(); ++i) {
-            let contour = contours.get(i);
-            let perimeter = cv.arcLength(contour, true);
-            let epsilon = 0.03 * perimeter; 
-            let approx = new cv.Mat();
-            cv.approxPolyDP(contour, approx, epsilon, true);
-
-            let numVertices = approx.rows;
-
-            let shape;
-            if (numVertices === 3) {
-                shape = "Triangle";
-            } else if (numVertices === 4) {
-                let { width, height } = cv.boundingRect(approx);
-                let aspectRatio = width / height;
-                let area = cv.contourArea(approx);
-                if (Math.abs(aspectRatio - 1) < 0.2) {
-                    shape = "Square";
-                    shapeCount["Quadrilateral"]++; 
-                } else if (aspectRatio > 1.2 && aspectRatio < 2.3) {
-                    shape = "Rectangle";
-                    shapeCount["Quadrilateral"]++; 
-                } else {
-                    shape = "Quadrilateral";
-                }
-            } else if (numVertices === 5) {
-                shape = "Pentagon";
-            } else {
-                shape = "Circle";
-            }
-
-            shapeCount[shape]++;
-
-            let moments = cv.moments(contour, false);
-            let x = moments.m10 / moments.m00;
-            let y = moments.m01 / moments.m00;
-            let center = new cv.Point(x, y);
-
-            imageCentroid.x += x;
-            imageCentroid.y += y;
-
-            cv.drawContours(dst, contours, i, colors[0], 2, cv.LINE_8, hierarchy, 0);
-            cv.putText(dst, shape, center, cv.FONT_HERSHEY_SIMPLEX, 0.5, new cv.Scalar(57, 255, 20, 255), 2);
-            contour.delete();
-            approx.delete();
-
-            let colorText = getColorText(src, x, y);
-            cv.putText(dst, colorText, new cv.Point(x, y - 20), cv.FONT_HERSHEY_SIMPLEX, 0.5, new cv.Scalar(57, 255, 20, 255), 2);
-            colorCounts[colorText.toLowerCase()]++;
-
-            objectCentroid.x = x;
-            objectCentroid.y = y;
+            // Draw image on canvas
+            ctx.drawImage(img, 0, 0, img.width, img.height);
         }
+        img.src = event.target.result;
+    }
 
-        imageCentroid.x /= contours.size();
-        imageCentroid.y /= contours.size();
+    reader.readAsDataURL(file);
+}
 
-        cv.circle(dst, new cv.Point(imageCentroid.x, imageCentroid.y), 5, new cv.Scalar(0, 255, 0, 255), cv.FILLED);
-        cv.circle(dst, new cv.Point(objectCentroid.x, objectCentroid.y), 5, new cv.Scalar(255, 0, 0, 255), cv.FILLED);
+    //SHAPE DETECTION FUNCTION
 
-        document.getElementById('imageCentroid').innerText = `Image Centroid: (${imageCentroid.x.toFixed(2)}, ${imageCentroid.y.toFixed(2)})`;
-        document.getElementById('objectCentroid').innerText = `Object Centroid: (${objectCentroid.x.toFixed(2)}, ${objectCentroid.y.toFixed(2)})`;
+   document.getElementById('detectShapesButton').onclick = async function() {
+    this.disabled = true;
 
-        cv.imshow('imageCanvas', dst);
-        src.delete();
-        gray.delete();
-        hierarchy.delete();
-        contours.delete();
-        dst.delete();
-
-        updateCounts();
-
-        this.disabled = false;
+    shapeCount = {
+        "Circle": 0,
+        "Triangle": 0,
+        "Square": 0,
+        "Rectangle": 0,
+        "Quadrilateral": 0,
+        "Pentagon": 0
     };
-  
-    document.getElementById('detectObjectButton').onclick = async function() {
-    // Read the source image from the canvas
+
+    colorCounts = {
+        'yellow': 0,
+        'red': 0,
+        'blue': 0,
+        'green': 0
+    };
+
     let src = cv.imread('imageCanvas');
-    
-    // Convert the image to grayscale
     let gray = new cv.Mat();
     cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
 
-    // Apply adaptive thresholding to segment the object
     cv.adaptiveThreshold(gray, gray, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2);
 
-    // Apply morphological operations to clean up the binary image
     let kernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3));
     cv.dilate(gray, gray, kernel);
     cv.erode(gray, gray, kernel);
 
-    // Find contours in the binary image
     let contours = new cv.MatVector();
     let hierarchy = new cv.Mat();
     cv.findContours(gray, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
-    // Clone the source image to draw the markings
     let dst = src.clone();
-    let colors = [new cv.Scalar(0, 255, 0, 255)]; // Green color for bounding boxes
+    let colors = [new cv.Scalar(57, 255, 20, 255)];
 
-    // Variables to store object area and centroid
+    for (let i = 0; i < contours.size(); ++i) {
+        let contour = contours.get(i);
+        let perimeter = cv.arcLength(contour, true);
+        let epsilon = 0.03 * perimeter; 
+        let approx = new cv.Mat();
+        cv.approxPolyDP(contour, approx, epsilon, true);
+
+        let numVertices = approx.rows;
+
+        let shape;
+        if (numVertices === 3) {
+            shape = "Triangle";
+        } else if (numVertices === 4) {
+            let { width, height } = cv.boundingRect(approx);
+            let aspectRatio = width / height;
+            let area = cv.contourArea(approx);
+            if (Math.abs(aspectRatio - 1) < 0.2) {
+                shape = "Square";
+                shapeCount["Quadrilateral"]++; 
+            } else if (aspectRatio > 1.2 && aspectRatio < 2.3) {
+                shape = "Rectangle";
+                shapeCount["Quadrilateral"]++; 
+            } else {
+                shape = "Quadrilateral";
+            }
+        } else if (numVertices === 5) {
+            shape = "Pentagon";
+        } else {
+            shape = "Circle";
+        }
+
+        shapeCount[shape]++;
+
+        let moments = cv.moments(contour, false);
+        let x = moments.m10 / moments.m00;
+        let y = moments.m01 / moments.m00;
+        let center = new cv.Point(x, y);
+
+        cv.drawContours(dst, contours, i, colors[0], 2, cv.LINE_8, hierarchy, 0);
+        cv.putText(dst, shape, center, cv.FONT_HERSHEY_SIMPLEX, 0.5, new cv.Scalar(57, 255, 20, 255), 2);
+        contour.delete();
+        approx.delete();
+
+        let colorText = getColorText(src, x, y);
+        cv.putText(dst, colorText, new cv.Point(x, y - 20), cv.FONT_HERSHEY_SIMPLEX, 0.5, new cv.Scalar(57, 255, 20, 255), 2);
+        colorCounts[colorText.toLowerCase()]++;
+    }
+
+    cv.imshow('imageCanvas', dst);
+    src.delete();
+    gray.delete();
+    hierarchy.delete();
+    contours.delete();
+    dst.delete();
+
+    updateCounts();
+
+    this.disabled = false;
+};
+
+// Function to clear centroid display area
+function clearCentroidDisplay() {
+    let centroidDisplay = document.getElementById('centroidDisplay');
+    centroidDisplay.innerHTML = '';
+}
+
+// DETECT OBJECT FUNCTION
+
+document.getElementById('detectObjectButton').onclick = async function() {
+    clearCentroidDisplay();
+    let src = cv.imread('imageCanvas');
+     // let src = mat.clone();
+    let gray = new cv.Mat();
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+    cv.adaptiveThreshold(gray, gray, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2); 
+    let kernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3)); 
+    cv.dilate(gray, gray, kernel);
+    cv.erode(gray, gray, kernel);
+    let contours = new cv.MatVector();  
+    let hierarchy = new cv.Mat();
+    cv.findContours(gray, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+    let dst = src.clone(); 
+    let colors = [new cv.Scalar(0, 255, 0, 255)]; 
     let objectArea = 0;
     let objectCentroidX = 0;
     let objectCentroidY = 0;
-
-    // Initialize image centroid object
     let imageCentroid = { x: 0, y: 0 };
-
-    // Iterate through each contour
-    for (let i = 0; i < contours.size(); ++i) {
+    for (let i = 0; i < contours.size(); ++i) {  
         let contour = contours.get(i);
         let rect = cv.boundingRect(contour);
         let point1 = new cv.Point(rect.x, rect.y);
         let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
 
-        // Draw bounding box around the contour
-        cv.rectangle(dst, point1, point2, colors[0], 2);
+        cv.rectangle(dst, point1, point2, colors[0], 2);    
 
-        // Calculate object area
-        let area = cv.contourArea(contour);
+        let area = cv.contourArea(contour);  
         objectArea += area;
 
-        // Calculate object centroid
         let moments = cv.moments(contour, false);
         let cx = moments.m10 / moments.m00;
         let cy = moments.m01 / moments.m00;
 
-        // Draw a cross marking at the centroid
         let size = 5;
         cv.line(dst, new cv.Point(cx - size, cy), new cv.Point(cx + size, cy), colors[0], 2);
         cv.line(dst, new cv.Point(cx, cy - size), new cv.Point(cx, cy + size), colors[0], 2);
 
-        // Sum up centroid coordinates
         objectCentroidX += cx;
         objectCentroidY += cy;
 
-        // Sum up image centroid coordinates
-        imageCentroid.x += cx;
-        imageCentroid.y += cy;
-
-        // Release resources
         contour.delete();
     }
+    cv.imshow('imageCanvas', dst); 
 
-    // Display the result image on the canvas
-    cv.imshow('imageCanvas', dst);
-
-    // Display object area and centroid directly below the image
     if (contours.size() > 0) {
         let centroidDisplay = document.getElementById('centroidDisplay');
 
-        // Calculate average centroid coordinates
         objectCentroidX /= contours.size();
         objectCentroidY /= contours.size();
 
@@ -446,21 +520,8 @@ body {
         let objectCentroidDisplay = document.createElement('p');
         objectCentroidDisplay.innerText = 'Object Centroid: (' + objectCentroidX.toFixed(2) + ', ' + objectCentroidY.toFixed(2) + ')';
         centroidDisplay.appendChild(objectCentroidDisplay);
-
-        // Calculate average image centroid coordinates
-        imageCentroid.x /= contours.size();
-        imageCentroid.y /= contours.size();
-
-        // Add labels for Image Centroid and Object Centroid
-        document.getElementById('imageCentroid').innerText = `Image Centroid: (${imageCentroid.x.toFixed(2)}, ${imageCentroid.y.toFixed(2)})`;
-        
-        // Add label for Image Area
-        let imageAreaDisplay = document.createElement('p');
-        imageAreaDisplay.innerText = 'Image Area: ' + src.cols * src.rows;
-        centroidDisplay.appendChild(imageAreaDisplay);
     }
 
-    // Release resources
     src.delete();
     gray.delete();
     hierarchy.delete();
@@ -468,82 +529,192 @@ body {
     dst.delete();
 };
 
-// Event listener for rotation input
-document.getElementById('rotateInput').addEventListener('input', (e) => {
-    let degree = parseInt(e.target.value);
-    rotationDegree = degree;
-    rotateImage(rotationDegree);
-    // Update rotation value display
-    document.getElementById('rotationValue').innerText = degree;
-});
-
-// Event listener for background removal threshold slider
-document.getElementById('thresholdSlider').addEventListener('input', (e) => {
-    let threshold = parseInt(e.target.value);
-    removeBackground(mat, threshold);
-    // Update threshold value display
-    document.getElementById('thresholdValue').innerText = threshold;
-});
-
-
-let rotationDegree = 0;
-let flipMode = 0; // 0: No flip, 1: Horizontal flip, 2: Vertical flip
-
-// Function to rotate the image
-function rotateImage(degree) {
-    let rotatedMat = new cv.Mat();
-    let center = new cv.Point(mat.cols / 2, mat.rows / 2);
-    let M = cv.getRotationMatrix2D(center, degree, 1);
-    cv.warpAffine(mat, rotatedMat, M, mat.size(), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
-
-    cv.imshow('imageCanvas', rotatedMat);
+function getOriginalImageDimensions(imgElement, callback) {
+    let img = new Image();
+    img.onload = function() {
+        callback(img.naturalWidth, img.naturalHeight);
+    };
+    img.src = imgElement.src;
 }
 
-// Function to flip the image
-function flipImage(flipMode) {
-    let flippedMat = new cv.Mat();
-    cv.flip(mat, flippedMat, flipMode);
-
-    cv.imshow('imageCanvas', flippedMat);
-    mat.delete();
-    mat = flippedMat;
+function getOriginalImageDimensions(imgElement, callback) {
+    let img = new Image();
+    img.onload = function() {
+        callback(img.naturalWidth, img.naturalHeight);
+    };
+    img.src = imgElement.src;
 }
 
-// Event listener for rotation input
-document.getElementById('rotateInput').addEventListener('input', (e) => {
-    let degree = parseInt(e.target.value);
-    rotationDegree = degree;
-    rotateImage(rotationDegree);
-});
+document.getElementById('markCentroidButton').onclick = function() {
+    let src = cv.imread('imageCanvas');
+    let dst = src.clone();
+    let crossColor = new cv.Scalar(0, 255, 0, 255); 
 
-// Event listener for mirror selection
-document.getElementById('mirrorSelect').addEventListener('change', (e) => {
-    let mode = parseInt(e.target.value);
-    flipMode = mode;
-    flipImage(flipMode);
-});
-
-// JavaScript code
-
-// Event listener for translation button
-document.getElementById('applyTranslationButton').addEventListener('click', () => {
+    // Apply translation
     let translateX = parseInt(document.getElementById('translateXInput').value);
     let translateY = parseInt(document.getElementById('translateYInput').value);
 
-    translateImage(translateX, translateY);
+    // Calculate the center of the image after translation
+    let centerX = (src.cols + translateX) / 2;
+    let centerY = (src.rows + translateY) / 2;
+
+    // Draw centroid on the canvas
+    let crossSize = 10; 
+    let crossThickness = 2;
+
+    cv.line(dst, new cv.Point(centerX - crossSize, centerY), new cv.Point(centerX + crossSize, centerY), crossColor, crossThickness);
+    cv.line(dst, new cv.Point(centerX, centerY - crossSize), new cv.Point(centerX, centerY + crossSize), crossColor, crossThickness);
+    cv.imshow('imageCanvas', dst); 
+
+    // Calculate centroid in image coordinates
+    let imageCentroidX = centerX;
+    let imageCentroidY = centerY;
+
+    let imageWidth = src.cols;
+    let imageHeight = src.rows;
+    let imageArea = imageWidth * imageHeight;
+
+    let centroidDisplay = document.getElementById('centroidDisplay');
+    centroidDisplay.innerHTML = ''; 
+    let imageCentroidDisplay = document.createElement('p');
+    imageCentroidDisplay.innerText = 'Image Centroid: (' + imageCentroidX.toFixed(2) + ', ' + imageCentroidY.toFixed(2) + ')';
+    centroidDisplay.appendChild(imageCentroidDisplay);
+
+    let imageAreaDisplay = document.createElement('p');
+    imageAreaDisplay.innerText = 'Image Area: ' + imageArea.toFixed(2) + ' (Width: ' + imageWidth + ', Height: ' + imageHeight + ')';
+    centroidDisplay.appendChild(imageAreaDisplay);
+
+    let originalDimensionsDisplay = document.createElement('p');
+    originalDimensionsDisplay.innerText = 'Original Image Dimensions: ' + imageWidth + ' x ' + imageHeight;
+    centroidDisplay.appendChild(originalDimensionsDisplay);
+
+    let imgElement = document.getElementById('imageOriginal');  
+    getOriginalImageDimensions(imgElement, function(originalWidth, originalHeight) {
+        let originalArea = originalWidth * originalHeight;
+
+        let originalAreaDisplay = document.createElement('p');
+        originalAreaDisplay.innerText = 'Original Image Area: ' + originalArea.toFixed(2);
+        centroidDisplay.appendChild(originalAreaDisplay);
+    });
+
+    src.delete();
+    dst.delete();
+};
+
+
+//MIRRORING FUNCTION
+document.getElementById('applyTranslationButton').style.display = 'none';
+
+let rotationDegree = 0;
+let flipMode = 0;
+
+document.getElementById('rotateInput').addEventListener('input', (e) => {
+    let degree = parseInt(e.target.value);
+    rotationDegree = degree;
+    applyTransformations();
+    document.getElementById('rotationValue').innerText = degree;  
 });
 
-// Function to translate the image
-function translateImage(translateX, translateY) {
-    let translatedMat = new cv.Mat();
-    let M = cv.matFromArray(2, 3, cv.CV_64FC1, [1, 0, translateX, 0, 1, translateY]);
-    cv.warpAffine(mat, translatedMat, M, mat.size(), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+document.getElementById('mirrorSelect').addEventListener('change', (e) => {
+    let mode = parseInt(e.target.value);
+    flipMode = mode;
+    applyTransformations();
+});
 
-    cv.imshow('imageCanvas', translatedMat);
-    mat.delete();
-    mat = translatedMat;
+document.getElementById('applyTranslationButton').addEventListener('click', () => {
+    applyTransformations();
+});
+
+// Add event listeners to the sliders
+document.getElementById('translateXInput').addEventListener('input', function() {
+    // Update slider value display
+    document.getElementById('translateXValue').innerText = this.value;
+    applyTransformations();
+});
+
+document.getElementById('translateYInput').addEventListener('input', function() {
+    // Update slider value display
+    document.getElementById('translateYValue').innerText = this.value;
+    applyTransformations();
+});
+
+function applyTransformations() {
+    // Reset canvas to original image
+    let canvas = document.getElementById('imageCanvas');
+    let originalImage = document.getElementById('imageOriginal');
+    let ctx = canvas.getContext('2d');
+    canvas.width = originalImage.width;
+    canvas.height = originalImage.height;
+    ctx.drawImage(originalImage, 0, 0);
+
+    // Apply transformations
+    rotateImage(rotationDegree);
+    flipImage(flipMode);
+    translateImage(parseInt(document.getElementById('translateXInput').value), parseInt(document.getElementById('translateYInput').value));
 }
 
+function rotateImage(degree) {
+    let canvas = document.getElementById('imageCanvas');
+    let tempCanvas = document.createElement('canvas');
+    let ctx = canvas.getContext('2d');
+    let tempCtx = tempCanvas.getContext('2d');
+    
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+
+    tempCtx.translate(canvas.width / 2, canvas.height / 2);
+    tempCtx.rotate(degree * Math.PI / 180);
+    tempCtx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
+    tempCtx.rotate(-degree * Math.PI / 180);
+    tempCtx.translate(-canvas.width / 2, -canvas.height / 2);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(tempCanvas, 0, 0);
+}
+
+function flipImage(flipMode) {
+    let canvas = document.getElementById('imageCanvas');
+    let tempCanvas = document.createElement('canvas');
+    let ctx = canvas.getContext('2d');
+    let tempCtx = tempCanvas.getContext('2d');
+    
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+
+    if (flipMode === 1) { // Horizontal flip
+        tempCtx.scale(-1, 1);
+        tempCtx.drawImage(canvas, -canvas.width, 0);
+    } else if (flipMode === 2) { // Vertical flip
+        tempCtx.scale(1, -1);
+        tempCtx.drawImage(canvas, 0, -canvas.height);
+    } else { // No flip
+        tempCtx.drawImage(canvas, 0, 0);
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(tempCanvas, 0, 0);
+}
+
+function translateImage(translateX, translateY) {
+    let canvas = document.getElementById('imageCanvas');
+    let tempCanvas = document.createElement('canvas');
+    let ctx = canvas.getContext('2d');
+    let tempCtx = tempCanvas.getContext('2d');
+    
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+
+    tempCtx.drawImage(canvas, 0, 0);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.translate(translateX, translateY);
+    ctx.drawImage(tempCanvas, 0, 0);
+    ctx.translate(-translateX, -translateY);
+}
+
+
+
+// COLOR
 
     function updateCounts() {
         let shapeCountDiv = document.getElementById('shapeCount');
@@ -581,9 +752,7 @@ function translateImage(translateX, translateY) {
         } else {
             color = "Unknown";
         }
-
         hsv.delete();
-
         return color;
     }
 
@@ -592,36 +761,33 @@ function translateImage(translateX, translateY) {
         this.download = "image.png";
     };
 
-    // Function to remove background
-    function removeBackground(mat, threshold) {
-        // Convert the image to grayscale
-        let gray = new cv.Mat();
-        cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
+    // REMOVE BACKGROUND FUNCTION
 
-        // Threshold the image to create a binary mask for background
+    document.getElementById('thresholdSlider').addEventListener('input', function() {
+        document.getElementById('thresholdValue').innerText = this.value;
+    });
+
+    document.getElementById('removeBackgroundButton').onclick = function() {
+        let threshold = parseInt(document.getElementById('thresholdSlider').value);  
+
+        removeBackground(mat, threshold);
+    };
+
+    function removeBackground(mat, threshold) {
+        let gray = new cv.Mat();  
+        cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
         let binary = new cv.Mat();
         cv.threshold(gray, binary, threshold, 255, cv.THRESH_BINARY);
-
-        // Find contours of the binary mask
         let contours = new cv.MatVector();
         let hierarchy = new cv.Mat();
         cv.findContours(binary, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-
-        // Create a black filled mask
         let mask = cv.Mat.zeros(mat.rows, mat.cols, cv.CV_8UC1);
-
-        // Draw contours on the mask (in white)
-        let color = new cv.Scalar(255, 255, 255, 255); // White color
+        let color = new cv.Scalar(255, 255, 255, 255); 
         cv.drawContours(mask, contours, -1, color, -1, 8, hierarchy, 2);
-
-        // Apply the mask to the original image to remove background
-        let result = new cv.Mat();
+        let result = new cv.Mat(); 
         cv.bitwise_and(mat, mat, result, mask);
+        cv.imshow('imageCanvas', result);    
 
-        // Display the result
-        cv.imshow('imageCanvas', result);
-
-        // Clean up
         gray.delete();
         binary.delete();
         contours.delete();
@@ -630,186 +796,252 @@ function translateImage(translateX, translateY) {
         result.delete();
     }
 
-    document.getElementById('removeBackgroundButton').onclick = function() {
-        // Get the background removal threshold from the slider
-        let threshold = parseInt(document.getElementById('thresholdSlider').value);
+//HISTOGRAM FUNCTION
 
-        removeBackground(mat, threshold);
-    };
-
-     /** 
-    @module histogram
-    */
-    "use strict";
-    function Histogram(conf){
-        if (!(this instanceof Histogram)) return new Histogram(conf);
-
-        this.histogram = [];
-        this.conf = {
-            width: 255,
-            height: 128,
-            red: "#d55",
-            green: "#5d5",
-            blue: "#55d",
-            black: "#555"
+    document.getElementById('histogramButton').onclick = function() {
+            displayHistogram();
         };
-        this.setConf(conf);
-        this.canvas = document.getElementById('histogramCanvas');
-        this.context = this.canvas.getContext('2d');
-        this.valueCanvas = document.getElementById('valueCanvas');
-        this.valueContext = this.valueCanvas.getContext('2d');
-        this.clearRGB();
-    }
 
-    Histogram.prototype.setConf = function(conf){
-        var name = "";
-        for (name in conf){
-            this.conf[name] = conf[name];
+        function displayHistogram() {
+            const canvas = document.getElementById('imageCanvas'); 
+            const ctx = canvas.getContext('2d'); 
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height); 
+            const histRed = histogramRGB(colorChannels.Red, imageData);  
+            const histGreen = histogramRGB(colorChannels.Green, imageData);
+            const histBlue = histogramRGB(colorChannels.Blue, imageData);
+            document.getElementById('histRed').getElementsByClassName('histogram-bars')[0].innerHTML = histRed;
+            document.getElementById('histGreen').getElementsByClassName('histogram-bars')[0].innerHTML = histGreen;
+            document.getElementById('histBlue').getElementsByClassName('histogram-bars')[0].innerHTML = histBlue;
         }
-        return this;
-    };
+        const colorChannels = {
+            Red: 0,
+            Green: 1,
+            Blue: 2
+        };
+        function histogramRGB(channel, imageData) {
+            const colourFrequencies = getColourFrequencies(channel, imageData);  
+            const histogram = createHistogram(channel, colourFrequencies.colourFrequencies, colourFrequencies.maxFrequency);     
+            return histogram; 
+        }
+        function getColourFrequencies(channel, imageData) { 
+            const startIndex = channel;  
+            let maxFrequency = 0;  
+            const colourFrequencies = Array(256).fill(0);
 
-    Histogram.prototype.forImg = function(source){
-        var srcCanvas = document.createElement("canvas");
-        var ctx = srcCanvas.getContext('2d');
-        ctx.canvas.width = source.width;
-        ctx.canvas.height = source.height;
-        ctx.drawImage(source, 0, 0);
-        return this.forCanvas(srcCanvas);
-    };
-
-    Histogram.prototype.forCanvas = function(source){
-        var ctx = source.getContext('2d');
-        var img = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-        
-        for (var i=0; i<img.data.length; i=i+4){
-            this.setRGB({
-                r: img.data[i],
-                g: img.data[i+1],
-                b: img.data[i+2]
-            });
+            for (let i = startIndex, len = imageData.data.length; i < len; i += 4) {   
+                colourFrequencies[imageData.data[i]]++;
+                if (colourFrequencies[imageData.data[i]] > maxFrequency) { 
+                    maxFrequency = colourFrequencies[imageData.data[i]];
+                }
+            }
+            return { colourFrequencies, maxFrequency }; 
         }
 
-        return this.draw();
-    };
-
-    Histogram.prototype.clearRGB = function(){
-        for (var i=0; i<=255; i++){
-            this.histogram[i] = {
-                r: 0,
-                g: 0,
-                b: 0
-            };
+        function createHistogram(channel, colourFrequencies, maxFrequency) { 
+            const histWidth = 512;   
+            const histHeight = 316;
+            const columnWidth = 2;
+            const pixelsPerUnit = histHeight / maxFrequency;
+            let hexColour; 
+            let x = 0;
+            let columnHeight;
+            let svgstring = `<svg width='${histWidth}px' height='${histHeight}px' xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink'>\n`;
+            for (let i = 0; i <= 255; i++) { 
+                hexColour = i.toString(16).padStart(2, "0"); 
+                switch (channel) {
+                    case colorChannels.Red:
+                        hexColour = "#" + hexColour + "0000";
+                        break;
+                    case colorChannels.Green:
+                        hexColour = "#00" + hexColour + "00";
+                        break;
+                    case colorChannels.Blue:
+                        hexColour = "#0000" + hexColour;
+                        break;
+                }
+                columnHeight = colourFrequencies[i] * pixelsPerUnit;
+                svgstring += `    <rect fill='${hexColour}' stroke='${hexColour}' stroke-width='0.25px' width='${columnWidth}' height='${columnHeight}' y='${histHeight - columnHeight}' x='${x}' />\n`;
+                x += columnWidth;
+            }
+            svgstring += "</svg>";  
+            return svgstring; 
         }
-    };
 
-    Histogram.prototype.setRGB = function(val){
-        this.histogram[Math.min(255, Math.max(0, val.r))].r++;
-        this.histogram[Math.min(255, Math.max(0, val.g))].g++;
-        this.histogram[Math.min(255, Math.max(0, val.b))].b++;
-    };
 
-    Histogram.prototype.draw = function(){
-        this.context.canvas.width = this.conf.width;
-        this.context.canvas.height = this.conf.height;	
-        
-        var m=0;
-        for (var i = 1; i < 255; i++){
-            m = Math.max(m, this.histogram[i].r, this.histogram[i].g, this.histogram[i].b);
-        }
-        
-        this.context.globalCompositeOperation="lighter";
+//BINARY PROJECTION
 
-        this.drawPoly(this.conf.red, function(val){
-            return val.r / m;
-        });
-
-        this.drawPoly(this.conf.green, function(val){
-            return val.g / m;
-        });
-
-        this.drawPoly(this.conf.blue, function(val){
-            return val.b / m;
-        });
-
-        this.context.globalCompositeOperation="source-over";	
-
-        this.drawPoly(this.conf.black, function(val){
-            var r = val.r / m;
-            var g = val.g / m;
-            var b = val.b / m;
-            return Math.min(r,g,b);					
-        });
-
-        // Clear the value canvas
-        this.valueContext.clearRect(0, 0, this.valueCanvas.width, this.valueCanvas.height);
-        
-        // Draw values
-        this.valueContext.font = "14px Arial, sans-serif";
-        this.valueContext.fillStyle = '#000';
-        this.valueContext.fillText("Red: " + Math.round(this.histogram[255].r * 100 / m) / 100, 10, 20);
-        this.valueContext.fillText("Green: " + Math.round(this.histogram[255].g * 100 / m) / 100, 10, 40);
-        this.valueContext.fillText("Blue: " + Math.round(this.histogram[255].b * 100 / m) / 100, 10, 60);
-        this.valueContext.fillText("Black: " + Math.round(Math.min(this.histogram[255].r, this.histogram[255].g, this.histogram[255].b) * 100 / m) / 100, 10, 80);
-
-        return this.canvas.toDataURL();
-    };
-
-    Histogram.prototype.drawPoly = function(colour, val){
-    var w = this.context.canvas.width;
-    var h = this.context.canvas.height;
-    var barWidth = w / 255; // Adjust the width of each bar
-
-    this.context.beginPath();        
-    this.context.moveTo(0, h);        
-    this.context.fillStyle = colour;
-    
-    for (var x = 0; x <= 255; x++){
-        // Calculate the X-coordinate of the bar start point
-        var xStart = x * barWidth;
-        // Calculate the X-coordinate of the bar end point
-        var xEnd = (x + 1) * barWidth;
-        // Adjust the height of the bar based on the histogram value
-        var barHeight = h - (val(this.histogram[x]) * h);
-        
-        // Draw the bar
-        this.context.lineTo(xStart, barHeight);
-        this.context.lineTo(xEnd, barHeight);
-    }           
-    
-    this.context.lineTo(w, h);
-    this.context.closePath();
-    this.context.fill();
+document.getElementById('binaryProjectionButton').onclick = function() { 
+let projectionType = document.getElementById('projectionSelect').value; 
+    showBinaryProjection(projectionType);
 };
 
-
-
-    // Function to show RGB histogram
-function showRGBHistogram() {
-    // Access the original image element
-    var imgElement = document.getElementById('imageOriginal');
-
-    // Check if the image is loaded
-    if (imgElement.src !== '') {
-        // Create a new histogram instance
-        var histogram = new Histogram();
-
-        // Draw the histogram for the original image
-        histogram.forImg(imgElement);
-    } else {
-        // Alert if no image is selected
-        alert("Please select an image first.");
+function showBinaryProjection(projectionType) {   
+    let src = cv.imread('imageCanvas');  
+    let gray = new cv.Mat(); 
+    let binary = new cv.Mat(); 
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);     
+    cv.threshold(gray, binary, 128, 255, cv.THRESH_BINARY);
+    let projection;
+    if (projectionType === 'horizontal') {
+        projection = getHorizontalProjection(binary); 
+    } else { 
+        projection = getVerticalProjection(binary);  
     }
+    let dst = new cv.Mat.zeros(binary.rows, binary.cols, cv.CV_8UC3);    
+    for (let i = 0; i < projection.length; i++) {  
+        if (projectionType === 'horizontal') { 
+            let value = projection[i];
+            for (let j = 0; j < value; j++) {
+                dst.ucharPtr(i, j)[0] = 255; 
+                dst.ucharPtr(i, j)[1] = 255;
+                dst.ucharPtr(i, j)[2] = 255;
+            }
+        } else {
+            let value = projection[i];  
+            for (let j = 0; j < value; j++) {
+                dst.ucharPtr(j, i)[0] = 255;
+                dst.ucharPtr(j, i)[1] = 255;
+                dst.ucharPtr(j, i)[2] = 255;
+            }
+        }
+    }
+    cv.imshow('imageCanvas', dst);
+
+    src.delete();
+    gray.delete();
+    binary.delete();
+    dst.delete();
+}
+function getHorizontalProjection(binary) {   
+    let projection = new Array(binary.rows).fill(0);  
+    for (let i = 0; i < binary.rows; i++) {  
+        for (let j = 0; j < binary.cols; j++) {
+            if (binary.ucharPtr(i, j)[0] === 255) {     
+                projection[i]++;  
+            }
+        }
+    }
+    return projection; 
 }
 
+function getVerticalProjection(binary) {
+    let projection = new Array(binary.cols).fill(0);
+    for (let j = 0; j < binary.cols; j++) {
+        for (let i = 0; i < binary.rows; i++) {
+            if (binary.ucharPtr(i, j)[0] === 255) {
+                projection[j]++; 
+            }
+        }
+    }
+    return projection;
+}
 
-    document.getElementById('resetButton').addEventListener('click', function() {
-    // Reload the original image onto the canvas
-    var originalImage = document.getElementById('imageOriginal');
-    var canvas = document.getElementById('imageCanvas');
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+let originalImage = null; 
+
+function onOpenCvReady() {
+    console.log('OpenCV.js is ready');
+}
+
+//FILTER FUNCTION
+
+let filteredImage = null;
+document.getElementById('applyFilterButton').addEventListener('click', function() {
+    let filterType = document.getElementById('filterSelect').value;
+    let src = cv.imread('imageCanvas');
+
+    switch(filterType) {
+        case 'smoothing':
+            applySmoothingFilter(src);
+            break;
+        case 'gaussian':
+            applyGaussianBlurFilter(src);
+            break;
+        case 'sharpening':
+            applySharpeningFilter(src);
+            break;
+        case 'meanRemoval':
+            applyMeanRemovalFilter(src);
+            break;
+        case 'emboss':
+            applyEmbossFilter(src);
+            break;
+        case 'custom':
+            let customKernelValues = getCustomKernelValues();
+            applyCustomFilter(src, customKernelValues);
+            break;
+        default:
+            console.error('Invalid filter type');
+    }
+    src.delete();  
 });
+
+function applySmoothingFilter(mat) {
+    cv.blur(mat, mat, new cv.Size(3, 3), new cv.Point(-1, -1), cv.BORDER_DEFAULT);
+    cv.imshow('imageCanvas', mat);
+}
+
+function applyGaussianBlurFilter(mat) {
+    cv.GaussianBlur(mat, mat, {width: 3, height: 3}, 0, 0, cv.BORDER_DEFAULT); 
+    cv.imshow('imageCanvas', mat);
+}
+
+function applySharpeningFilter(mat) {
+    let kernel = cv.matFromArray(3, 3, cv.CV_32F, [0, -1, 0, -1, 5, -1, 0, -1, 0]);  
+    cv.filter2D(mat, mat, cv.CV_8U, kernel, new cv.Point(-1, -1), 0, cv.BORDER_DEFAULT);  
+    kernel.delete(); 
+    cv.imshow('imageCanvas', mat);
+}
+
+function applyMeanRemovalFilter(mat) {
+    let kernel = cv.matFromArray(3, 3, cv.CV_32F, [-1, -1, -1, -1, 9, -1, -1, -1, -1]);
+    cv.filter2D(mat, mat, cv.CV_8U, kernel, new cv.Point(-1, -1), 0, cv.BORDER_DEFAULT);
+    kernel.delete();
+    cv.imshow('imageCanvas', mat);
+}
+
+function applyEmbossFilter(mat) {
+    let kernel = cv.matFromArray(3, 3, cv.CV_32F, [-2, -1, 0, -1, 1, 1, 0, 1, 2]);
+    cv.filter2D(mat, mat, cv.CV_8U, kernel, new cv.Point(-1, -1), 0, cv.BORDER_DEFAULT);
+    kernel.delete();
+    cv.imshow('imageCanvas', mat);
+}
+
+function applyCustomFilter(mat, kernelValues) {
+    if (kernelValues.length !== 9) { 
+        console.error('Invalid custom kernel size. Must be a 3x3 matrix.');
+        return;
+    }
+    let kernel = cv.matFromArray(3, 3, cv.CV_32F, kernelValues);  
+    cv.filter2D(mat, mat, cv.CV_8U, kernel, new cv.Point(-1, -1), 0, cv.BORDER_DEFAULT); 
+    kernel.delete();   
+    cv.imshow('imageCanvas', mat); 
+}
+
+function getCustomKernelValues() {
+    let kernelValues = [];
+    for (let i = 0; i < 9; i++) {    
+        let value = parseFloat(document.getElementById(`kernelValue${i}`).value); 
+        kernelValues.push(value);  
+    }
+    return kernelValues;     
+}
+
+//RESET FUNCTION
+
+   document.getElementById('resetButton').addEventListener('click', function() {
+    var originalImage = document.getElementById('imageOriginal');  
+    var canvas = document.getElementById('imageCanvas');    
+    var ctx = canvas.getContext('2d');    
+    ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);  
+
+    
+    // Reset slider values
+    document.getElementById('translateXInput').value = 0;
+    document.getElementById('translateYInput').value = 0;
+    document.getElementById('translateXValue').innerText = '0';
+    document.getElementById('translateYValue').innerText = '0';
+});
+
 
 
     function onOpenCvReady() {
