@@ -17,7 +17,6 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
           const data = imageData.data;
 
           const binaryThreshold = parseFloat(document.getElementById('binaryThresholdSlider').value);
-          
          
    // Background removal implementation with binary threshold adjustment
    if (document.getElementById('backgroundRemovalCheckbox').checked) {
@@ -55,56 +54,60 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
     processImage(); 
   });
   
-  function processImage() {
-    const originalImg = document.getElementById('original-img');
-    if (originalImg.src === "" || originalImg.src === "#" || originalImg.src === "about:blank" || originalImg.complete === false) {
+  // Process image function to apply background removal and other adjustments
+function processImage() {
+  const originalImg = document.getElementById('original-img');
+  if (originalImg.src === "" || originalImg.src === "#" || originalImg.src === "about:blank" || originalImg.complete === false) {
       alert("Please select an image first.");
       return;
-    }
-  
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-  
-    canvas.width = originalImg.width; 
-    canvas.height = originalImg.height; 
-  
-    canvas.style.width = "100%";
-  
-    ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height); 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-  
-    if (document.getElementById('grayscaleCheckbox').checked) {
-      grayscale(data);
-    }
-  
-    if (document.getElementById('binaryCheckbox').checked) {
-      binary(data);
-    }
-
-   // Background removal implementation with binary threshold adjustment
-   if (document.getElementById('backgroundRemovalCheckbox').checked) {
-    let binaryThreshold = parseFloat(document.getElementById('binaryThresholdSlider').value);
-    removeBackground(data, binaryThreshold);
-}
-
-    if (document.getElementById('colorHueCheckbox').checked) {
-      applyColorHue(data);
-    }
-  
-    if (document.getElementById('adjustmentsOptions').checked) {
-      applyAdjustments(data);
-    }
-  
-    const selectedFilter = document.getElementById('filterSelect').value;
-    applyFilter(data, selectedFilter);
-  
-    ctx.putImageData(imageData, 0, 0);
-    const img = document.getElementById('processed-img');
-    img.src = canvas.toDataURL();
-    const processedContainer = document.getElementById('processed-container');
-    processedContainer.style.display = 'block';
   }
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = originalImg.width;
+  canvas.height = originalImg.height;
+
+  canvas.style.width = "100%";
+
+  ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  if (document.getElementById('grayscaleCheckbox').checked) {
+      grayscale(data);
+  }
+
+  if (document.getElementById('binaryCheckbox').checked) {
+      binary(data);
+  }
+
+  if (document.getElementById('backgroundRemovalCheckbox').checked) {
+      let binaryThreshold = parseFloat(document.getElementById('binaryThresholdSlider').value);
+      removeBackground(data, binaryThreshold);
+  }
+
+  if (document.getElementById('colorHueCheckbox').checked) {
+      applyColorHue(data);
+  }
+
+  if (document.getElementById('adjustmentsOptions').checked) {
+      applyAdjustments(data);
+  }
+
+  const selectedFilter = document.getElementById('filterSelect').value;
+  applyFilter(data, selectedFilter);
+
+  ctx.putImageData(imageData, 0, 0);
+  const img = document.getElementById('processed-img');
+  img.src = canvas.toDataURL();
+  const processedContainer = document.getElementById('processed-container');
+  processedContainer.style.display = 'block';
+
+  // Convert the processed image data to base64 and pass it to the external HTML page
+  var editedImageData = canvas.toDataURL();
+  document.getElementById('content-iframe').contentWindow.postMessage(editedImageData, '*');
+}
 
   document.getElementById('colorHueCheckbox').addEventListener('change', function(event) {
     const colorHueOptions = document.getElementById('colorHueOptions');
@@ -403,8 +406,9 @@ function removeBackground(data, binaryThreshold) {
       data[i] = newData[i];
     }
   }
+
   
-  
+
   function applyFilter(data, filter) {
     if (filter !== 'nofilter') {
       switch (filter) {
@@ -525,18 +529,15 @@ function removeBackground(data, binaryThreshold) {
     // Get the processed image data as base64
     const processedImgData = document.getElementById('processed-img').src;
     // Redirect to the external HTML file with image data as URL parameter
-    window.location.href = `ShapesnColors/shapesncolor.html?imgData=${processedImgData}`;
+    window.location.href = `shapesncolor.html?imgData=${processedImgData}`;
   });
 
 
 // Function to update the processed image in the external HTML
 function updateExternalImage(src) {
-    // Send the processed image source to the external HTML via localStorage
-    localStorage.setItem('processedImageSrc', src);
+  // Send the processed image source to the external HTML via localStorage
+  localStorage.setItem('processedImageSrc', src);
 }
-
-
-
 
 // Function to handle file selection and image processing
 document.getElementById('fileInput').addEventListener('change', function(event) {
@@ -546,9 +547,12 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
       var imageData = e.target.result;
       // Pass image data to the external HTML page
       document.getElementById('content-iframe').contentWindow.postMessage(imageData, '*');
+      // Call processImage function to apply background removal and other adjustments
+      processImage();
   };
   reader.readAsDataURL(file);
 });
+
 // Event listener for editing options changes
 document.querySelectorAll('input[type="checkbox"], input[type="range"], select').forEach(function(input) {
   input.addEventListener('change', function() {
@@ -566,5 +570,6 @@ document.querySelectorAll('input[type="checkbox"], input[type="range"], select')
           document.getElementById('content-iframe').contentWindow.postMessage(editedImageData, '*');
       };
       img.src = document.getElementById('processed-img').src;
+      processImage();
   });
 });
