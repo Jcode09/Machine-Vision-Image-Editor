@@ -1,4 +1,3 @@
-
 /* Add your custom styles here */
 
 /* Online CSS Import */
@@ -28,7 +27,6 @@ body {
   -webkit-background-clip: text; /* Clip the background to the text */
   -webkit-text-fill-color: transparent; /* Set text fill color to transparent */
 }
-
 
 .line-text {
   position: absolute;
@@ -62,7 +60,7 @@ body {
     justify-content: center; /* Center the options horizontally */
     max-width: 800px; /* Set maximum width */
     margin: 0 auto; /* Center the container horizontally */
-  }
+}
 
 #options-container label {
     display: inline-block;
@@ -176,8 +174,7 @@ body {
 #original-img,
 #processed-img {
   max-width: 100%;
-  font-family: Papyrus, fantasy;
-  max-height: 300px; 
+  height: auto; /* Ensure images maintain aspect ratio */
   border: 1px solid white; 
   color: white;
   border-radius: 5px; 
@@ -216,46 +213,46 @@ body {
     height: 20px;
     margin-right: 5px;
     border: 1px solid #000;
-  }
-  
-  #redSliderLabel {
-    color: red;
-  }
-  
-  #greenSliderLabel {
-    color: green;
-  }
-  
-  #blueSliderLabel {
-    color: blue;
-  }
+}
 
- /* CSS for adjustmentsContainer */
+#redSliderLabel {
+    color: red;
+}
+
+#greenSliderLabel {
+    color: green;
+}
+
+#blueSliderLabel {
+    color: blue;
+}
+
+/* CSS for adjustmentsContainer */
 #adjustmentsContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  
-  /* CSS for image icons */
-  #adjustmentsContainer img {
+}
+
+/* CSS for image icons */
+#adjustmentsContainer img {
     width: 15px; /* Adjust size as needed */
     height: auto;
-  }
-  
-  /* CSS for slider inputs */
-  #adjustmentsContainer input[type="range"] {
+}
+
+/* CSS for slider inputs */
+#adjustmentsContainer input[type="range"] {
     width: 100px; /* Adjust size as needed */
     margin-top: 5px; /* Adjust spacing */
-  }
-  
-  #options-container img {
+}
+
+#options-container img {
     width: 20px; /* Adjust the width as needed */
     height: auto;
     margin-right: 10px;
-  }
-  
-  label {
+}
+
+label {
     font-family: 'Lucida Handwriting Std', sans-serif;
     color: rgb(224, 210, 210);
     font-size: 18px; /* Adjust the font size */
@@ -263,22 +260,21 @@ body {
 }
 
 #options-container button#shapesColorDetectionBtn {
-  background-color: #130241; /* Blue background color */
-  color: #fff; /* White text color */
-  border: none;
-  font-family: 'Lucida Handwriting Std', sans-serif;
-  padding: 12px 24px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 10px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  font-size: 16px;
-  text-transform: uppercase;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: #130241; /* Blue background color */
+    color: #fff; /* White text color */
+    border: none;
+    font-family: 'Lucida Handwriting Std', sans-serif;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: 16px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 #options-container button#shapesColorDetectionBtn:hover {
-  background-color: #02577e; /* Darker blue on hover */
-  transform: scale(1.05); /* Increase size on hover */
+    background-color: #02577e; /* Darker blue on hover */
+    transform: scale(1.05); /* Increase size on hover */
 }
-
